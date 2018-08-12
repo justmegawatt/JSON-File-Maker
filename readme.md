@@ -2,6 +2,7 @@
 Use Python to generate a JSON file
 
 **Example:**
+
     from jsonfilemaker import json
 
     my_new_file = json('./my_file.json')
@@ -13,6 +14,7 @@ Use Python to generate a JSON file
     my_new_file.close()
 
 **Creates a new file called 'my_file.json' which contains this:**
+
     {
         "name": "Robert Smithing",
         "dateOfBirth": "Sunday, August 12th 2018",
