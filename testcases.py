@@ -3,127 +3,75 @@ from pathlib import Path
 import os
 import jsonfilemaker as jfm
 
-class TestWordToJSON(unittest.TestCase):
+class TestJSONFileMaker(unittest.TestCase):
 
     def setUp(self):
-        pass
+        self.filename = './test.json'
 
     def delete_file(self, filename):
         file_location = Path(filename)
         if (file_location.exists()):
             os.remove(filename)
 
-    def test_create_file(self):
-        filename = './testfile.json'
-        file = jfm.create_file(filename)
-        test_file = Path(filename)
-        self.assertTrue(test_file.exists())
-        file.close()
-        if (test_file.exists()):
-            os.remove(filename)
+    def test_create_new_json_file(self):
+        json = jfm.json(self.filename)
+        json.close()
+        test_path = Path(self.filename)
+        self.assertTrue(test_path.exists())
 
-    def test_open_initial_bracket(self):
-        filename = "./test.json"
-        file = jfm.create_file(filename)
-        jfm.open_initial_bracket(file)
+    def test_opening_and_closing_brackets(self):
+        json = jfm.json(self.filename)
+        json.close()
+        file = open(self.filename, 'r')
+        self.assertEqual(['{\n', '}'], file.readlines())
         file.close()
-        opened_file = open(filename, 'r')
-        self.assertEqual("{\n", opened_file.readlines()[-1])
-        opened_file.close()
-        self.delete_file(filename)
 
-    def test_open_json_section(self):
-        filename = "./test.json"
-        file = jfm.create_file(filename)
-        jfm.open_initial_bracket(file)
-        jfm.open_json_section(file, "testvalues")
+    def test_add_field_one_string_value(self):
+        json = jfm.json(self.filename)
+        json.add_field('Date', 'Sunday, August 12th 2018')
+        json.close()
+        file = open(self.filename, 'r')
+        self.assertEqual(['{\n','    "Date": "Sunday, August 12th 2018"\n' , '}'], file.readlines())
         file.close()
-        opened_file = open(filename, 'r')
-        self.assertEqual('    "testvalues": ', opened_file.readlines()[-1])
-        opened_file.close()
-        self.delete_file(filename)
 
-    def test_add_value(self):
-        filename = "./test.json"
-        file = jfm.create_file(filename)
-        jfm.open_initial_bracket(file)
-        jfm.open_json_section(file, "date")
-        jfm.add_value(file, "Sunday, August 12th 2018", False)
+    def test_add_field_three_number_values(self):
+        json = jfm.json(self.filename)
+        json.add_field('firstNumber', 5)
+        json.add_field('secondNumber', 522)
+        json.add_field('thirdNumber', 5.55)
+        json.close()
+        file = open(self.filename, 'r')
+        self.assertEqual(['{\n', '    "firstNumber": 5,\n', '    "secondNumber": 522,\n', '    "thirdNumber": 5.55\n', '}'], file.readlines())
         file.close()
-        opened_file = open(filename, 'r')
-        self.assertEqual('    "date": "Sunday, August 12th 2018"\n', opened_file.readlines()[-1])
-        opened_file.close()
-        self.delete_file(filename)
 
-    def test_open_json_list(self):
-        filename = "./test.json"
-        file = jfm.create_file(filename)
-        jfm.open_initial_bracket(file)
-        jfm.open_json_section(file, "testvalues")
-        jfm.open_json_list(file)
+    def test_add_lists(self):
+        json = jfm.json(self.filename)
+        values = ["First", "Second", 3, 55, "Fifth"]
+        json.add_field('listOfItems', values)
+        second_values = [1, 2, 3, 4, 5, "Hello", 6]
+        json.add_field('secondListOfItems', second_values)
+        json.close()
+        file = open(self.filename, 'r')
+        self.assertEqual(['{\n', '    "listOfItems": [\n', '        "First",\n', '        "Second",\n', '        3,\n', '        55,\n', '        "Fifth"\n', '    ],\n', '    "secondListOfItems": [\n', '        1,\n', '        2,\n', '        3,\n', '        4,\n', '        5,\n', '        "Hello",\n', '        6\n', '    ]\n', '}'], file.readlines())
         file.close()
-        opened_file = open(filename, 'r')
-        self.assertEqual('    "testvalues": [\n', opened_file.readlines()[-1])
-        opened_file.close()
-        self.delete_file(filename)
 
-    def test_add_values(self):
-        values = ["first", "second", "third"]
-        filename = "./test.json"
-        file = jfm.create_file(filename)
-        jfm.open_initial_bracket(file)
-        jfm.open_json_section(file, "testvalues")
-        jfm.open_json_list(file)
-        jfm.add_values(file, values)
+    def test_full_test(self):
+        json = jfm.json(self.filename)
+        values = ["First", "Second", 3, 55, "Fifth"]
+        json.add_field('listOfItems', values)
+        json.add_field('random', 283823823)
+        json.add_field('random2', 9129191)
+        json.add_field('random3', "random values")
+        second_values = [1, 2, 3, 4, 5, "Hello", 6]
+        json.add_field('secondListOfItems', second_values)
+        json.close()
+        file = open(self.filename, 'r')
+        self.assertEqual(['{\n', '    "listOfItems": [\n', '        "First",\n', '        "Second",\n', '        3,\n', '        55,\n', '        "Fifth"\n', '    ],\n', '    "random": 283823823,\n', '    "random2": 9129191,\n', '    "random3": "random values",\n', '    "secondListOfItems": [\n', '        1,\n', '        2,\n', '        3,\n', '        4,\n', '        5,\n', '        "Hello",\n', '        6\n', '    ]\n', '}'], file.readlines())
         file.close()
-        opened_file = open(filename, "r")
-        self.assertEqual(['{\n', '    "testvalues": [\n', '        "first",\n', '        "second",\n', '        "third"\n'], opened_file.readlines())
-        opened_file.close()
-        self.delete_file(filename)
 
-    def test_close_json_list(self):
-        values = ["first", "second", "third"]
-        filename = "./test.json"
-        file = jfm.create_file(filename)
-        jfm.open_initial_bracket(file)
-        jfm.open_json_section(file, "testvalues")
-        jfm.open_json_list(file)
-        jfm.add_values(file, values)
-        jfm.close_json_list(file, False)
-        file.close()
-        opened_file = open(filename, "r")
-        self.assertEqual('    ]\n', opened_file.readlines()[-1])
-        opened_file.close()
-        self.delete_file(filename)
-
-    def test_close_last_bracket(self):
-        values = ["first", "second", "third"]
-        filename = "./test.json"
-        file = jfm.create_file(filename)
-        jfm.open_initial_bracket(file)
-        jfm.open_json_section(file, "testvalues")
-        jfm.open_json_list(file)
-        jfm.add_values(file, values)
-        jfm.close_json_list(file, False)
-        jfm.close_last_bracket(file)
-        file.close()
-        opened_file = open(filename, "r")
-        self.assertEqual('}', opened_file.readlines()[-1])
-        opened_file.close()
-        self.delete_file(filename)
-
-    def test_full_feature_test(self):
-        file = open("./new_file.json", "w")
-        jfm.open_initial_bracket(file)
-        jfm.open_json_section(file, "date")
-        jfm.add_value(file, "Sunday, August 12th 2018", True)
-        jfm.open_json_section(file, "paragraphs")
-        jfm.open_json_list(file)
-        jfm.add_values(file, ["First", "Second", "Third"])
-        jfm.close_json_list(file, True)
-        jfm.open_json_section(file, "another")
-        jfm.close_last_bracket(file)
-        file.close()
+    def tearDown(self):
+        self.delete_file(self.filename)
+        pass
 
 if __name__ == '__main__':
     unittest.main()
