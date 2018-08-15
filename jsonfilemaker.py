@@ -12,6 +12,7 @@ class json:
 
     def add_value(self, value):
         if type(value) == str:
+            value = self.format_text(value)
             self.file.write('"{}"'.format(value) + ',')
         elif type(value) == int or type(value) == float:
             self.file.write('{}'.format(value) + ',')
@@ -24,11 +25,13 @@ class json:
         for index, value in enumerate(values):
             if (index != len(values)-1):
                 if (type(value) == str):
+                    value = self.format_text(value)
                     self.file.write('        "{}",\n'.format(value))
                 elif (type(value) == int or type(value) == float):
                     self.file.write('        {},\n'.format(value))
             elif (index == len(values)-1):
                 if (type(value) == str):
+                    value = self.format_text(value)
                     self.file.write('        "{}"\n'.format(value))
                 elif (type(value) == int or type(value) == float):
                     self.file.write('        {}\n'.format(value))
@@ -66,3 +69,9 @@ class json:
         self.close_last_bracket()
         self.file.close()
         self.remove_last_comma()
+
+    def format_text(self, text):
+        text = text.replace("\"", "\\\"")
+        if (text == '\n'):
+            text = ""
+        return text

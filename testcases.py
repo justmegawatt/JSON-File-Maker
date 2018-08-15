@@ -55,6 +55,17 @@ class TestJSONFileMaker(unittest.TestCase):
         self.assertEqual(['{\n', '    "listOfItems": [\n', '        "First",\n', '        "Second",\n', '        3,\n', '        55,\n', '        "Fifth"\n', '    ],\n', '    "secondListOfItems": [\n', '        1,\n', '        2,\n', '        3,\n', '        4,\n', '        5,\n', '        "Hello",\n', '        6\n', '    ]\n', '}'], file.readlines())
         file.close()
 
+    def test_format_text(self):
+        text = "\"that\""
+        json = jfm.json(self.filename)
+        test = json.format_text(text)
+        json.close()
+        self.assertEqual("\\\"that\\\"", test)
+
+        text2 = "\n"
+        result = json.format_text(text2)
+        self.assertEqual("", result)
+
     def test_full_test(self):
         json = jfm.json(self.filename)
         values = ["First", "Second", 3, 55, "Fifth"]
