@@ -59,12 +59,12 @@ class TestJSONFileMaker(unittest.TestCase):
         text = "\"that\""
         json = jfm.json(self.filename)
         test = json.format_text(text)
-        json.close()
         self.assertEqual("\\\"that\\\"", test)
 
         text2 = "\n"
         result = json.format_text(text2)
-        self.assertEqual("", result)
+        self.assertEqual("\\n", result)
+        json.close()
 
     def test_full_test(self):
         json = jfm.json(self.filename)

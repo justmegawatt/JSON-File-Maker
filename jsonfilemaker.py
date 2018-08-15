@@ -72,6 +72,5 @@ class json:
 
     def format_text(self, text):
         text = text.replace("\"", "\\\"")
-        if (text == '\n'):
-            text = ""
+        text = text.replace("\n", "\\n")
         return text
